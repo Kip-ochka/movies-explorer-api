@@ -5,6 +5,8 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { errorHandler } = require('./middlewares/errorHandler');
+const router = require('./routes/index');
 
 const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/filmsdb' } = process.env;
 
@@ -19,13 +21,14 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 app.use(limiter);
+
 app.use(requestLogger);
 app.use(express.json());
 app.use(cookieParser());
-// routes
+app.use(router);
 app.use(errorLogger);
 app.use(errors());
-// errorhandler
+app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`App listening at port ${PORT}`);
 });
