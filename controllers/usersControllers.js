@@ -16,9 +16,9 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.cookie('token', token, {
         maxAge: 999999999,
-        httpOnly: true,
-        sameSite: true,
-        secure: true,
+        // httpOnly: true,
+        // sameSite: true,
+        // secure: true,
       })
         .send({ email });
     }).catch((err) => {
@@ -81,8 +81,10 @@ const updateData = (req, res, next, userData) => {
 };
 
 module.exports.updateUserInfo = (req, res, next) => {
-  User.findOne(req.body.email)
+  const { email } = req.body;
+  User.findOne({ email })
     .then((matchedData) => {
+      console.log(matchedData);
       if (matchedData && matchedData._id.toString() !== req.user._id) {
         next(new MatchedError(MATCHED_EMAIL));
       }
