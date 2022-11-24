@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const BadRequestError = require('../errors/badRequest');
 const MatchedError = require('../errors/matched');
+const {
+  MATCHED_EMAIL, VALIDATION_ERROR, LOGOUT_MESSAGE, BAD_REQUEST_DATA, BAD_REQUEST_ID,
+} = require('../utils/variables');
 
 const { JWT_SECRET, NODE_ENV } = process.env;
 
@@ -12,7 +15,10 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.cookie('token', token, {
-        maxAge: 999999999, httpOnly: true, sameSite: true, secure: true,
+        maxAge: 999999999,
+        httpOnly: true,
+        sameSite: true,
+        secure: true,
       })
         .send({ email });
     }).catch((err) => {
@@ -32,9 +38,9 @@ module.exports.createUser = (req, res, next) => {
     }).then((user) => { res.send(user); })
       .catch((err) => {
         if (err.code === 11000) {
-          next(new MatchedError('Пользователь с данным email уж существует'));
+          next(new MatchedError(MATCHED_EMAIL));
         } else if (err.name === 'ValidationError') {
-          next(new BadRequestError('Ошибка валидации'));
+          next(new BadRequestError(VALIDATION_ERROR));
         } else {
           next(err);
         }
@@ -43,7 +49,7 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.logout = (_, res, next) => {
-  res.clearCookie('token').send({ message: 'Вы вышли из профиля' })
+  res.clearCookie('token').send({ message: LOGOUT_MESSAGE })
     .catch((err) => {
       next(err);
     });
@@ -65,9 +71,9 @@ const updateData = (req, res, next, userData) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Отправленные данные не корректны, перепроверьте данные.'));
+        next(new BadRequestError(BAD_REQUEST_DATA));
       } else if (err.name === 'CastError') {
-        next(new BadRequestError('Не корректный _id пользователя'));
+        next(new BadRequestError(BAD_REQUEST_ID));
       } else {
         next(err);
       }
@@ -78,7 +84,7 @@ module.exports.updateUserInfo = (req, res, next) => {
   User.findOne(req.body.email)
     .then((matchedData) => {
       if (matchedData && matchedData._id.toString() !== req.user._id) {
-        next(new MatchedError('Данный email уже используется'));
+        next(new MatchedError(MATCHED_EMAIL));
       }
     }).then(() => {
       const userData = {
@@ -88,9 +94,9 @@ module.exports.updateUserInfo = (req, res, next) => {
       updateData(req, res, next, userData);
     }).catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Отправленные данные не корректны, перепроверьте данные.'));
+        next(new BadRequestError(BAD_REQUEST_DATA));
       } else if (err.name === 'CastError') {
-        next(new BadRequestError('Не корректный _id пользователя'));
+        next(new BadRequestError(BAD_REQUEST_ID));
       } else {
         next(err);
       }

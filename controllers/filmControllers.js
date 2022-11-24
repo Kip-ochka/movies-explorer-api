@@ -2,6 +2,9 @@ const Films = require('../models/film');
 const NotFoundError = require('../errors/notFound');
 const BadRequestError = require('../errors/badRequest');
 const ForbiddenError = require('../errors/forbidden');
+const {
+  EXISITNG_ITEM, VALIDATION_ERROR, NOT_FOUND_FILM, DONT_OWNER, DELETED_MESSAGE, BAD_REQUEST_FILM,
+} = require('../utils/variables');
 
 module.exports.getMyFilms = (req, res, next) => {
   Films.find({ owner: req.user._id })
@@ -17,14 +20,14 @@ module.exports.addNewFilm = (req, res, next) => {
   })
     .then((film) => {
       if (film) {
-        throw new ForbiddenError('Такой фильм уже добавлен');
+        throw new ForbiddenError(EXISITNG_ITEM);
       }
       return Films.create({ ...req.body, owner: req.user._id })
         .then((newFilm) => res.status(201).send(newFilm));
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Ошибка валидации'));
+        next(new BadRequestError(VALIDATION_ERROR));
       } else {
         next(err);
       }
@@ -32,21 +35,21 @@ module.exports.addNewFilm = (req, res, next) => {
 };
 
 module.exports.deleteFilms = (req, res, next) => {
-  Films.findById(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Карточка с таким id не найдена');
+  Films.findById(req.params._id)
+    .then((film) => {
+      if (!film) {
+        throw new NotFoundError(NOT_FOUND_FILM);
       }
-      if (card.owner.toString() !== req.user._id) {
-        throw new ForbiddenError('Невозможно удалить чужие карточки');
+      if (film.owner.toString() !== req.user._id) {
+        throw new ForbiddenError(DONT_OWNER);
       }
-      return Films.findByIdAndDelete(req.params.cardId).then(() => {
-        res.send({ message: 'Карточка удалена' });
+      return Films.findByIdAndDelete(req.params.filmId).then(() => {
+        res.send({ message: DELETED_MESSAGE });
       });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Не корректный _id карточки'));
+        next(new BadRequestError(BAD_REQUEST_FILM));
       } else {
         next(err);
       }

@@ -1,9 +1,11 @@
+const { SERVER_ERROR } = require('../utils/variables');
+
 module.exports.errorHandler = (err, _, res, next) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
     .send({
-      message: statusCode === 500 ? 'Ошибка сервера' : message, err,
+      message: statusCode === 500 ? SERVER_ERROR : message, err,
     });
   next();
 };
