@@ -1,10 +1,10 @@
-const filmdb = require('mongoose');
+const moviesdb = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const Unauthorized = require('../errors/unauthorized');
 const { INCORRECT_DATA } = require('../utils/variables');
 
-const { Schema } = filmdb;
+const { Schema } = moviesdb;
 
 const userSchema = new Schema({
   name: {
@@ -49,4 +49,4 @@ userSchema.statics.findUser = function (email, password) {
     });
 };
 
-module.exports = filmdb.model('user', userSchema);
+module.exports = moviesdb.model('user', userSchema);

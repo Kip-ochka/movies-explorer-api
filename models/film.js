@@ -1,7 +1,7 @@
-const filmdb = require('mongoose');
+const moviesdb = require('mongoose');
 const validator = require('validator');
 
-const { Schema } = filmdb;
+const { Schema } = moviesdb;
 
 const filmSchema = new Schema({
   country: {
@@ -49,7 +49,7 @@ const filmSchema = new Schema({
     },
   },
   owner: {
-    type: filmdb.Schema.Types.ObjectId,
+    type: moviesdb.Schema.Types.ObjectId,
     ref: 'user',
     required: true,
   },
@@ -67,4 +67,4 @@ const filmSchema = new Schema({
   },
 }, { versionKey: false });
 
-module.exports = filmdb.model('card', filmSchema);
+module.exports = moviesdb.model('card', filmSchema);
