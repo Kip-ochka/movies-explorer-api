@@ -8,7 +8,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { errorHandler } = require('./middlewares/errorHandler');
 const router = require('./routes/index');
 
-const { PORT = 3001, MONGO_URL } = process.env;
+const { PORT = 3001, MONGO_URL = 'mongodb://localhost:27017/filmsdb' } = process.env;
 
 const app = express();
 moviesdb.connect(MONGO_URL);
