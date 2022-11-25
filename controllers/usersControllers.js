@@ -84,15 +84,16 @@ module.exports.updateUserInfo = (req, res, next) => {
   const { email } = req.body;
   User.findOne({ email })
     .then((matchedData) => {
-      if (matchedData && matchedData._id.toString() !== req.user._id) {
-        next(new MatchedError(MATCHED_EMAIL));
-      }
-      return matchedData;
+      // if (matchedData && matchedData._id.toString() !== req.user._id) {
+      //  next(new MatchedError(MATCHED_EMAIL));
+      // }
+      console.log(matchedData);
     }).then(() => {
       const userData = {
         name: req.body.name,
         email: req.body.email,
       };
+      console.log(userData);
       updateData(req, res, next, userData);
     }).catch((err) => {
       if (err.name === 'ValidationError') {
