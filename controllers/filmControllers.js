@@ -35,7 +35,8 @@ module.exports.addNewFilm = (req, res, next) => {
 };
 
 module.exports.deleteFilms = (req, res, next) => {
-  Films.findById(req.params._id)
+  const { _id } = req.params;
+  Films.findById({ _id })
     .then((film) => {
       if (!film) {
         throw new NotFoundError(NOT_FOUND_FILM);
@@ -43,7 +44,7 @@ module.exports.deleteFilms = (req, res, next) => {
       if (film.owner.toString() !== req.user._id) {
         throw new ForbiddenError(DONT_OWNER);
       }
-      return Films.findByIdAndDelete(req.params.filmId).then(() => {
+      return Films.findByIdAndDelete({ _id }).then(() => {
         res.send({ message: DELETED_MESSAGE });
       });
     })
