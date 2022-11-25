@@ -87,7 +87,7 @@ module.exports.updateUserInfo = (req, res, next) => {
       // if (matchedData && matchedData._id.toString() !== req.user._id) {
       //  next(new MatchedError(MATCHED_EMAIL));
       // }
-      console.log(matchedData);
+      console.log(matchedData, req.user._id);
     }).then(() => {
       const userData = {
         name: req.body.name,
