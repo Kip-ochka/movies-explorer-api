@@ -1,5 +1,5 @@
 const { Joi, celebrate } = require('celebrate');
-const urlValidator = require('./urlValidator');
+const { URL_REGEXP } = require('../variables');
 
 module.exports.validateFilmId = celebrate({
   params: Joi.object().keys({
@@ -14,9 +14,9 @@ module.exports.validateFilmData = celebrate({
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required().custom(urlValidator),
-    trailerLink: Joi.string().required().custom(urlValidator),
-    thumbnail: Joi.string().required().custom(urlValidator),
+    image: Joi.string().required().pattern(URL_REGEXP),
+    trailerLink: Joi.string().required().pattern(URL_REGEXP),
+    thumbnail: Joi.string().required().pattern(URL_REGEXP),
     movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),

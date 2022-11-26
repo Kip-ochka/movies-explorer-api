@@ -1,4 +1,4 @@
-module.exports.URL_REGEXP = /https?:\/\/(www\.)?[-a-zA-Z0-9]{1,256}\.[a-zA-Z0-9]{1,6}\b([-a-zA-Z0-9/]*)/;
+module.exports.URL_REGEXP = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
 
 module.exports.NOT_FOUND_URL_OR_METHOD = 'Ресурс не найден. Проверьте URL и метод запроса';
 module.exports.NOT_FOUND_FILM = 'Фильм с таким ID не найден';
