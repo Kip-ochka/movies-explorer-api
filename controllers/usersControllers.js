@@ -14,12 +14,11 @@ module.exports.login = (req, res, next) => {
   return User.findUser(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-      res.cookie('token', token, {
-        maxAge: 999999999,
-      //  httpOnly: true,
-      //  sameSite: true,
-      //  secure: true,
-      })
+      res.cookie('token', token, NODE_ENV === 'production'
+        ? {
+          maxAge: 999999999, httpOnly: true, sameSite: true, secure: true,
+        }
+        : { maxAge: 999999999 })
         .send({ email });
     }).catch((err) => {
       next(err);
