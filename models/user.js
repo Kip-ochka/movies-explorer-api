@@ -9,13 +9,13 @@ const { Schema } = moviesdb;
 const userSchema = new Schema({
   name: {
     type: String,
-    default: 'Гость',
+    required: true,
     minlength: [2, 'имя должно содержать минимум 2 символа'],
     maxlength: [30, 'максимальная длина имени 30 символов'],
   },
   email: {
     type: String,
-    requared: true,
+    required: true,
     unique: true,
     validate: {
       validator: (v) => validator.isEmail(v),
@@ -24,7 +24,7 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    requared: true,
+    required: true,
     select: false,
   },
 }, {

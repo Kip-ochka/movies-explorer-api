@@ -16,9 +16,9 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.cookie('token', token, {
         maxAge: 999999999,
-        httpOnly: true,
-        sameSite: true,
-        secure: true,
+      //  httpOnly: true,
+      //  sameSite: true,
+      //  secure: true,
       })
         .send({ email });
     }).catch((err) => {
@@ -48,11 +48,8 @@ module.exports.createUser = (req, res, next) => {
   });
 };
 
-module.exports.logout = (_, res, next) => {
-  res.clearCookie('token').send({ message: LOGOUT_MESSAGE })
-    .catch((err) => {
-      next(err);
-    });
+module.exports.logout = (_, res) => {
+  res.clearCookie('token').send({ message: LOGOUT_MESSAGE });
 };
 
 module.exports.getMyData = (req, res, next) => {
@@ -98,6 +95,8 @@ module.exports.updateUserInfo = (req, res, next) => {
         next(new BadRequestError(BAD_REQUEST_DATA));
       } else if (err.name === 'CastError') {
         next(new BadRequestError(BAD_REQUEST_ID));
+      } else if (err.code === 11000) {
+        next(new MatchedError(MATCHED_EMAIL));
       } else {
         next(err);
       }
