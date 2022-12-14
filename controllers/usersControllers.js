@@ -23,13 +23,19 @@ module.exports.login = (req, res, next) => {
         { expiresIn: "7d" }
       );
       res
-        .cookie("token", token, {
-          maxAge: 999999999,
-          //  httpOnly: true,
-          //  sameSite: true,
-          //  secure: true,
-        })
-        .send({ user });
+        .cookie(
+          "token",
+          token,
+          NODE_ENV === "production"
+            ? {
+                maxAge: 999999999,
+                httpOnly: true,
+                sameSite: true,
+                secure: true,
+              }
+            : { maxAge: 999999999 }
+        )
+        .send({ email });
     })
     .catch((err) => {
       next(err);
@@ -113,6 +119,8 @@ module.exports.updateUserInfo = (req, res, next) => {
         next(new BadRequestError(BAD_REQUEST_DATA));
       } else if (err.name === "CastError") {
         next(new BadRequestError(BAD_REQUEST_ID));
+      } else if (err.code === 11000) {
+        next(new MatchedError(MATCHED_EMAIL));
       } else {
         next(err);
       }

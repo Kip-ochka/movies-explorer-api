@@ -17,7 +17,7 @@ const filmSchema = new Schema({
     required: true,
   },
   year: {
-    type: Number,
+    type: String,
     required: true,
   },
   description: {

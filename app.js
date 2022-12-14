@@ -13,12 +13,11 @@ const { PORT = 3001, MONGO_URL = 'mongodb://localhost:27017/filmsdb' } = process
 
 const app = express();
 moviesdb.connect(MONGO_URL);
-
+app.use(requestLogger);
 app.use(helmet());
 app.use(cors)
 app.use(limiter);
 
-app.use(requestLogger);
 app.use(express.json());
 app.use(cookieParser());
 app.use(router);
