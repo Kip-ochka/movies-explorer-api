@@ -7,6 +7,7 @@ const limiter = require('./utils/limiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { errorHandler } = require('./middlewares/errorHandler');
 const router = require('./routes/index');
+const { cors } = require('./middlewares/cors');
 
 const { PORT = 3001, MONGO_URL = 'mongodb://localhost:27017/filmsdb' } = process.env;
 
@@ -14,6 +15,7 @@ const app = express();
 moviesdb.connect(MONGO_URL);
 app.use(requestLogger);
 app.use(helmet());
+app.use(cors)
 app.use(limiter);
 
 app.use(express.json());

@@ -1,16 +1,22 @@
-const Films = require('../models/film');
-const NotFoundError = require('../errors/notFound');
-const BadRequestError = require('../errors/badRequest');
-const ForbiddenError = require('../errors/forbidden');
+const Films = require("../models/film");
+const NotFoundError = require("../errors/notFound");
+const BadRequestError = require("../errors/badRequest");
+const ForbiddenError = require("../errors/forbidden");
 const {
-  EXISITNG_ITEM, VALIDATION_ERROR, NOT_FOUND_FILM, DONT_OWNER, DELETED_MESSAGE, BAD_REQUEST_FILM,
-} = require('../utils/variables');
+  EXISITNG_ITEM,
+  VALIDATION_ERROR,
+  NOT_FOUND_FILM,
+  DONT_OWNER,
+  DELETED_MESSAGE,
+  BAD_REQUEST_FILM,
+} = require("../utils/variables");
 
 module.exports.getMyFilms = (req, res, next) => {
   Films.find({ owner: req.user._id })
     .then((films) => {
       res.send(films);
-    }).catch(next);
+    })
+    .catch(next);
 };
 
 module.exports.addNewFilm = (req, res, next) => {
@@ -22,11 +28,12 @@ module.exports.addNewFilm = (req, res, next) => {
       if (film) {
         throw new ForbiddenError(EXISITNG_ITEM);
       }
-      return Films.create({ ...req.body, owner: req.user._id })
-        .then((newFilm) => res.status(201).send(newFilm));
+      return Films.create({ ...req.body, owner: req.user._id }).then(
+        (newFilm) => res.status(201).send(newFilm)
+      );
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         next(new BadRequestError(VALIDATION_ERROR));
       } else {
         next(err);
@@ -49,7 +56,7 @@ module.exports.deleteFilms = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === "CastError") {
         next(new BadRequestError(BAD_REQUEST_FILM));
       } else {
         next(err);

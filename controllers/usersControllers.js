@@ -1,11 +1,15 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
-const BadRequestError = require('../errors/badRequest');
-const MatchedError = require('../errors/matched');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+const BadRequestError = require("../errors/badRequest");
+const MatchedError = require("../errors/matched");
 const {
-  MATCHED_EMAIL, VALIDATION_ERROR, LOGOUT_MESSAGE, BAD_REQUEST_DATA, BAD_REQUEST_ID,
-} = require('../utils/variables');
+  MATCHED_EMAIL,
+  VALIDATION_ERROR,
+  LOGOUT_MESSAGE,
+  BAD_REQUEST_DATA,
+  BAD_REQUEST_ID,
+} = require("../utils/variables");
 
 const { JWT_SECRET, NODE_ENV } = process.env;
 
@@ -13,32 +17,46 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUser(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-      res.cookie('token', token, NODE_ENV === 'production'
-        ? {
-          maxAge: 999999999, httpOnly: true, sameSite: true, secure: true,
-        }
-        : { maxAge: 999999999 })
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+        { expiresIn: "7d" }
+      );
+      res
+        .cookie(
+          "token",
+          token,
+          NODE_ENV === "production"
+            ? {
+                maxAge: 999999999,
+                httpOnly: true,
+                sameSite: true,
+                secure: true,
+              }
+            : { maxAge: 999999999 }
+        )
         .send({ email });
-    }).catch((err) => {
+    })
+    .catch((err) => {
       next(err);
     });
 };
 
 module.exports.createUser = (req, res, next) => {
-  const {
-    name, email,
-  } = req.body;
+  const { name, email } = req.body;
   bcrypt.hash(req.body.password, 10).then((hash) => {
     User.create({
       name,
       email,
       password: hash,
-    }).then((user) => { res.send(user); })
+    })
+      .then((user) => {
+        res.send(user);
+      })
       .catch((err) => {
         if (err.code === 11000) {
           next(new MatchedError(MATCHED_EMAIL));
-        } else if (err.name === 'ValidationError') {
+        } else if (err.name === "ValidationError") {
           next(new BadRequestError(VALIDATION_ERROR));
         } else {
           next(err);
@@ -47,8 +65,13 @@ module.exports.createUser = (req, res, next) => {
   });
 };
 
-module.exports.logout = (_, res) => {
-  res.clearCookie('token').send({ message: LOGOUT_MESSAGE });
+module.exports.logout = (_, res, next) => {
+  res
+    .clearCookie("token")
+    .send({ message: LOGOUT_MESSAGE })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 module.exports.getMyData = (req, res, next) => {
@@ -66,9 +89,9 @@ const updateData = (req, res, next, userData) => {
   })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         next(new BadRequestError(BAD_REQUEST_DATA));
-      } else if (err.name === 'CastError') {
+      } else if (err.name === "CastError") {
         next(new BadRequestError(BAD_REQUEST_ID));
       } else {
         next(err);
@@ -83,16 +106,18 @@ module.exports.updateUserInfo = (req, res, next) => {
       if (matchedData && matchedData._id.toString() !== req.user._id) {
         next(new MatchedError(MATCHED_EMAIL));
       }
-    }).then(() => {
+    })
+    .then(() => {
       const userData = {
         name: req.body.name,
         email: req.body.email,
       };
       updateData(req, res, next, userData);
-    }).catch((err) => {
-      if (err.name === 'ValidationError') {
+    })
+    .catch((err) => {
+      if (err.name === "ValidationError") {
         next(new BadRequestError(BAD_REQUEST_DATA));
-      } else if (err.name === 'CastError') {
+      } else if (err.name === "CastError") {
         next(new BadRequestError(BAD_REQUEST_ID));
       } else if (err.code === 11000) {
         next(new MatchedError(MATCHED_EMAIL));
