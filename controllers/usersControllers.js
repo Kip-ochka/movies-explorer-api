@@ -35,7 +35,7 @@ module.exports.login = (req, res, next) => {
               }
             : { maxAge: 999999999 }
         )
-        .send({ email });
+        .send(user);
     })
     .catch((err) => {
       next(err);
